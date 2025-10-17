@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SAUAT-TI</title>
+  
+  <!-- Подключение Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+  
+  <style>
+    body, html {
+      margin: 0; padding: 0; height: 100%; 
+      font-family: 'Montserrat', Arial, sans-serif;
+      background-color: #f0f2f5;
+      display: flex; flex-direction: column;
+    }
+    header {
+      background-color: #282c34;
+      padding: 20px;
+      color: white;
+      font-size: 2em;
+      text-align: center;
+      font-weight: bold;
+      user-select: none;
+    }
+    main {
+      flex-grow: 1;
+      padding: 20px;
+    }
+    /* Стили для формы логина */
+    .login-container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    form {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      width: 320px;
+      box-sizing: border-box;
+    }
+    form h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+      box-sizing: border-box;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #282c34;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1em;
+      cursor: pointer;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    button:hover {
+      background-color: #3c4149;
+    }
+
+    /* Стили для меню */
+    nav {
+      background-color: #444a57;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      height: 50px;
+      color: white;
+    }
+    nav .brand {
+      font-weight: bold;
+      font-size: 1.2em;
+      user-select: none;
+    }
+    nav .menu {
+      display: flex;
+      gap: 15px;
+    }
+    nav .menu button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    nav .menu button:hover {
+      background-color: #5a6170;
+    }
+    nav .logout-btn {
+      background-color: #b03030;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    nav .logout-btn:hover {
+      background-color: #d04040;
+    }
+
+    /* Контент для разных разделов */
+    #content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      min-height: 300px;
+      user-select: text;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <header>SAUAT-TI</header>
+
+  <div id="app"></div>
+
+<script>
+  // База пользователей (логины и пароли)
+  // Изначально только админ
+  const users = {
+    'admin': 'admin123'
+  };
+
+  let currentUser = null; // Кто сейчас вошёл
+
+  const app = document.getElementById('app');
+
+  // Функция отрисовки формы логина
+  function renderLogin() {
+    app.innerHTML = `
+      <div class="login-container">
+        <form id="loginForm">
+          <h2>Вход в аккаунт</h2>
+          <input type="text" id="username" placeholder="Логин" required />
+          <input type="password" id="password" placeholder="Пароль" required />
+          <button type="submit">Войти</button>
+        </form>
+      </div>
+    `;
+
+    document.getElementById('loginForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if(users[username] && users[username] === password) {
+        currentUser = username;
+        renderApp();
+      } else {
+        alert('Неверный логин или пароль');
+      }
+    });
+  }
+
+  // Функция отрисовки основного интерфейса
+  function renderApp() {
+    app.innerHTML = `
+      <nav>
+        <div class="brand">SAUAT-TI</div>
+        <div class="menu">
+          <button data-section="home">Главная</button>
+          <button data-section="education">Образование</button>
+          <button data-section="admin" style="display: ${currentUser === 'admin' ? 'inline-block' : 'none'}">Админ</button>
+          <button class="logout-btn">Выйти</button>
+        </div>
+      </nav>
+      <main>
+        <div id="content">Добро пожаловать, <b>${currentUser}</b>! Вы на главной странице.</div>
+      </main>
+    `;
+
+    const content = document.getElementById('content');
+
+    // Обработчик кнопок меню
+    app.querySelectorAll('nav .menu button').forEach(button => {
+      button.addEventListener('click', () => {
+        const section = button.getAttribute('data-section');
+
+        if(section === 'home') {
+          content.innerHTML = `Добро пожаловать, <b>${currentUser}</b>! Вы на главной странице.`;
+        } else if(section === 'education') {
+          content.innerHTML = `
+            <h2>Образование</h2>
+            <p>Здесь будет информация об образовательных программах.</p>
+          `;
+        } else if(section === 'admin' && currentUser === 'admin') {
+          renderAdminPanel();
+        }
+      });
+    });
+
+    // Обработчик выхода
+    app.querySelector('.logout-btn').addEventListener('click', () => {
+      currentUser = null;
+      renderLogin();
+    });
+  }
+
+  // Функция для админ-панели (создание новых пользователей)
+  function renderAdminPanel() {
+    const content = document.getElementById('content');
+    content.innerHTML = `
+      <h2>Панель администратора</h2>
+      <form id="createUserForm">
+        <input type="text" id="newUsername" placeholder="Новый логин" required />
+        <input type="password" id="newPassword" placeholder="Новый пароль" required />
+        <button type="submit">Создать пользователя</button>
+      </form>
+      <h3>Список пользователей:</h3>
+      <ul id="userList"></ul>
+    `;
+
+    const userList = document.getElementById('userList');
+
+    function updateUserList() {
+      userList.innerHTML = '';
+      Object.keys(users).forEach(user => {
+        userList.innerHTML += `<li>${user}</li>`;
+      });
+    }
+
+    updateUserList();
+
+    document.getElementById('createUserForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const newUsername = document.getElementById('newUsername').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+
+      if(users[newUsername]) {
+        alert('Пользователь с таким логином уже существует');
+        return;
+      }
+
+      users[newUsername] = newPassword;
+      alert(`Пользователь ${newUsername} создан!`);
+      updateUserList();
+
+      // Очищаем форму
+      e.target.reset();
+    });
+  }
+
+  // Запуск
+  renderLogin();
+
+</script>
+
+</body>
+</html>
